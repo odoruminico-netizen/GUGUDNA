@@ -3,158 +3,235 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#132016">
+<meta name="theme-color" content="#f2c76c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>구구단 포켓몬 탐험대</title>
+<title>구구단 포켓몬 궁전</title>
+
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="구구단 궁전">
+<meta name="application-name" content="구구단 궁전">
+
 <style>
 :root{
-  --ink:#fff6d8; --muted:#bec6b5; --gold:#ffd45e; --orange:#ff9148;
-  --green:#82f27b; --red:#ff6d63; --dark:#0b130d; --line:rgba(255,240,190,.18);
+  --gold:#f6c95f; --gold2:#ffdf87; --teal:#0f7d82; --teal2:#1ea0a0;
+  --ink:#2a1b2f; --cream:#fff7dd; --rose:#b53f65; --green:#2da76f;
+  --red:#d84b4b; --navy:#22264a;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;min-height:100%;background:#0d1710;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
-body{min-height:100vh;overflow-x:hidden}
-button,input{font:inherit}
-button{border:0;cursor:pointer;touch-action:manipulation}
-.screen{display:none;min-height:100vh}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#f3d78d;color:var(--ink)}
+button,input{font:inherit} button{border:0;cursor:pointer;touch-action:manipulation}
+.screen{display:none;width:100%;height:100dvh;overflow:hidden}
 .screen.active{display:flex}
 
 /* START */
 #startScreen{
-  position:relative;align-items:center;justify-content:center;padding:22px;
-  background:radial-gradient(circle at 50% 18%,rgba(255,210,110,.11),transparent 30%),linear-gradient(#17261d 0 42%,#102017 42% 100%);
-  overflow:hidden
+  position:relative;align-items:center;justify-content:center;padding:16px;
+  background:
+    radial-gradient(circle at 50% 18%,rgba(255,255,255,.85),transparent 20%),
+    linear-gradient(180deg,#8ed7e3 0 36%,#e7b95e 36% 100%);
 }
-.sky{position:absolute;inset:0;opacity:.5;background-image:radial-gradient(circle,#fff3b9 0 1px,transparent 1.4px);background-size:78px 78px}
-.moon{position:absolute;right:8%;top:8%;width:72px;height:72px;border-radius:50%;background:#f3e1a3;box-shadow:0 0 35px rgba(245,223,150,.3)}
-.house{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:min(780px,120vw);height:58vh;background:linear-gradient(90deg,#4c3022,#6a422a 24%,#563622 48%,#70492e 72%,#4b3021);clip-path:polygon(7% 26%,30% 26%,39% 5%,50% 18%,62% 2%,75% 26%,94% 26%,100% 100%,0 100%,0 34%);opacity:.94}
-.house:before{content:"";position:absolute;left:8%;right:8%;top:27%;bottom:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 2px,transparent 2px 28px)}
-.window{position:absolute;bottom:14%;width:92px;height:116px;border:8px solid #2b2019;background:#efb95d;box-shadow:0 0 30px rgba(255,185,80,.25);z-index:2}
-.window.l{left:12%}.window.r{right:12%}
-.sign{position:absolute;bottom:37%;left:50%;transform:translateX(-50%) rotate(-2deg);z-index:3;background:#3b291d;border:3px solid #9b6b3d;border-radius:8px;padding:10px 18px;color:#f8d980;font-size:13px;font-weight:950;letter-spacing:2px;white-space:nowrap}
-.start-card{position:relative;z-index:5;width:min(100%,460px);padding:26px 20px 22px;border:1px solid rgba(255,238,180,.22);border-radius:24px;background:rgba(11,19,13,.9);box-shadow:0 24px 60px rgba(0,0,0,.45);backdrop-filter:blur(8px)}
-.logo-small{text-align:center;font-size:12px;letter-spacing:3px;color:#f5ce68;font-weight:950}
-.start-card h1{text-align:center;font-size:36px;line-height:1.08;letter-spacing:-2px;margin:7px 0 4px}
-.sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:21px}
-.name-label{font-size:12px;color:#e3d8b7;font-weight:900;margin:0 2px 7px}
-.name-input{width:100%;height:58px;border-radius:15px;border:2px solid rgba(255,219,123,.25);background:#0d1610;color:white;text-align:center;font-size:22px;font-weight:950;outline:none}
-.name-input:focus{border-color:#f3c75c}
-.primary{width:100%;height:60px;margin-top:12px;border-radius:16px;background:linear-gradient(#ffb448,#ed7f2d);color:#21140c;font-size:19px;font-weight:1000;box-shadow:0 5px 0 #9f481b}
-.primary:active{transform:translateY(3px);box-shadow:0 2px 0 #9f481b}
-.resume-stats{display:none;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 3px}
-.resume-stats.show{display:grid}
-.mini{background:rgba(255,255,255,.055);border:1px solid var(--line);border-radius:13px;padding:10px 5px;text-align:center}
-.mini b{display:block;color:#ffdc72;font-size:20px}.mini span{font-size:11px;color:var(--muted)}
-.link-btn{display:none;width:100%;margin-top:12px;background:transparent;color:#a8ab9e;text-decoration:underline;font-size:12px}
+.palace-bg{
+  position:absolute;left:50%;bottom:-3%;transform:translateX(-50%);
+  width:min(900px,125vw);height:62vh;
+  background:linear-gradient(180deg,#f8dc8e,#d58a42);
+  clip-path:polygon(0 100%,0 34%,8% 34%,8% 22%,16% 22%,16% 31%,27% 31%,31% 12%,36% 31%,45% 31%,50% 3%,55% 31%,64% 31%,69% 12%,73% 31%,84% 31%,84% 22%,92% 22%,92% 34%,100% 34%,100% 100%);
+  box-shadow:0 -18px 50px rgba(105,49,55,.18)
+}
+.palace-bg:before{
+  content:"";position:absolute;inset:38% 7% 0;
+  background:
+    radial-gradient(ellipse at 10% 30%,#18898e 0 8%,transparent 8.6%),
+    radial-gradient(ellipse at 30% 30%,#18898e 0 8%,transparent 8.6%),
+    radial-gradient(ellipse at 50% 30%,#18898e 0 8%,transparent 8.6%),
+    radial-gradient(ellipse at 70% 30%,#18898e 0 8%,transparent 8.6%),
+    radial-gradient(ellipse at 90% 30%,#18898e 0 8%,transparent 8.6%);
+}
+.start-card{
+  position:relative;z-index:5;width:min(100%,440px);padding:22px 18px 18px;
+  border:2px solid rgba(93,56,43,.16);border-radius:26px;
+  background:rgba(255,249,226,.93);box-shadow:0 24px 60px rgba(104,52,51,.25);
+  backdrop-filter:blur(8px)
+}
+.logo{text-align:center;font-size:12px;letter-spacing:3px;color:#9b5d1c;font-weight:950}
+.start-card h1{margin:6px 0 4px;text-align:center;font-size:35px;line-height:1.04;letter-spacing:-2px;color:#5b2e45}
+.sub{text-align:center;color:#795d64;font-size:14px;margin-bottom:18px}
+.label{font-size:11px;color:#8c6f58;font-weight:950;margin:0 2px 6px}
+.name-input{width:100%;height:56px;border-radius:15px;border:2px solid #e6c778;background:white;text-align:center;font-size:22px;font-weight:950;color:#4e3040;outline:none}
+.name-input:focus{border-color:#138b90}
+.primary{width:100%;height:58px;margin-top:11px;border-radius:16px;background:linear-gradient(#22a5a4,#0f7f84);color:white;font-size:19px;font-weight:1000;box-shadow:0 5px 0 #075e61}
+.primary:active{transform:translateY(3px);box-shadow:0 2px 0 #075e61}
+.resume{display:none;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0 3px}.resume.show{display:grid}
+.mini{background:#fff6d7;border:1px solid #ecd188;border-radius:12px;padding:9px 4px;text-align:center}
+.mini b{display:block;color:#a14d4b;font-size:19px}.mini span{font-size:10px;color:#856d66}
+.link{display:none;width:100%;margin-top:10px;background:none;color:#947b76;text-decoration:underline;font-size:12px}
 
 /* GAME */
-#gameScreen{flex-direction:column;align-items:center;padding:calc(12px + env(safe-area-inset-top)) 13px calc(14px + env(safe-area-inset-bottom));background:radial-gradient(circle at 50% -8%,rgba(106,160,97,.20),transparent 35%),linear-gradient(#17251b,#0c140e)}
-.shell{width:min(100%,560px)}
-.topbar{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 9px}
-.player{font-size:15px;font-weight:950}.player small{display:block;font-size:10px;color:#9da493;letter-spacing:1.5px}
-.stat-row{display:flex;gap:7px}
-.pill{border:1px solid var(--line);background:rgba(0,0,0,.18);border-radius:999px;padding:7px 10px;font-size:13px;font-weight:950}
-
-.hero-zone{
-  display:grid;grid-template-columns:128px 1fr;gap:10px;align-items:stretch;margin-bottom:10px
+#gameScreen{
+  position:relative;flex-direction:column;align-items:center;
+  padding:calc(4px + env(safe-area-inset-top)) 9px calc(6px + env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at 50% -10%,rgba(255,255,255,.9),transparent 25%),
+    linear-gradient(180deg,#8cdce5 0 31%,#f2c86e 31% 100%);
 }
-.trainer-card,.capture-card{
-  border:1px solid var(--line);background:rgba(10,17,12,.72);border-radius:18px;padding:10px;box-shadow:0 8px 20px rgba(0,0,0,.2)
+#gameScreen:before{
+  content:"";position:absolute;inset:21% 0 0;
+  background:
+    linear-gradient(90deg,transparent 0 8%,rgba(164,75,65,.14) 8% 10%,transparent 10% 90%,rgba(164,75,65,.14) 90% 92%,transparent 92%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.16) 0 2px,transparent 2px 42px);
+  pointer-events:none;
 }
-.trainer-title,.capture-title{font-size:10px;color:#d6c67d;font-weight:950;letter-spacing:1.3px}
-.trainer{
-  --muscle:0;
-  position:relative;height:128px;margin-top:4px;display:flex;justify-content:center;align-items:flex-end
+.shell{position:relative;z-index:2;width:min(100%,560px);height:100%;display:flex;flex-direction:column;gap:6px}
+.topbar{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 2px;flex:none}
+.player{font-size:14px;font-weight:950;color:#51324b}.player small{display:block;font-size:9px;letter-spacing:1.4px;color:#8b6e67}
+.stats{display:flex;gap:5px}.pill{background:rgba(255,250,229,.88);border:1px solid #dfbd64;border-radius:999px;padding:6px 9px;font-size:12px;font-weight:950;color:#573647}
+
+
+/* 20-slot Pokémon collection + Time Attack header */
+.collection-bar{
+  flex:none;height:48px;border-radius:15px;border:2px solid rgba(139,83,49,.16);
+  background:rgba(255,249,226,.94);padding:4px 7px;
+  display:grid;grid-template-columns:repeat(20,1fr);gap:2px;align-items:center;
+  box-shadow:0 5px 14px rgba(95,55,58,.10);overflow:hidden
 }
-.head{position:absolute;top:12px;width:44px;height:44px;border-radius:50%;background:#efc29a;border:3px solid #2c251d;z-index:4}
-.cap{position:absolute;top:5px;width:58px;height:23px;background:#e54a44;border:3px solid #2b241d;border-radius:18px 18px 7px 7px;z-index:5}
-.cap:after{content:"";position:absolute;width:29px;height:7px;background:#f4efe1;border:2px solid #2b241d;border-radius:0 9px 9px 0;right:-20px;top:12px}
-.body{position:absolute;bottom:11px;width:54px;height:68px;border-radius:12px 12px 8px 8px;background:#2f6db2;border:3px solid #222b26;z-index:2;transform:scaleX(calc(1 + var(--muscle)*.10))}
-.arm{position:absolute;bottom:39px;width:18px;height:52px;border-radius:13px;background:#efc29a;border:3px solid #2b251f;z-index:1;transform-origin:50% 100%}
-.arm.l{left:22px;transform:rotate(15deg) scaleX(calc(1 + var(--muscle)*.34))}
-.arm.r{right:22px;transform:rotate(-15deg) scaleX(calc(1 + var(--muscle)*.34))}
-.leg{position:absolute;bottom:0;width:18px;height:45px;border-radius:9px;background:#263b61;border:3px solid #222b26}
-.leg.l{left:42px}.leg.r{right:42px}
-.muscle-meter{height:7px;margin-top:5px;background:#1f2a21;border-radius:999px;overflow:hidden}
-.muscle-meter>div{height:100%;width:0;background:linear-gradient(90deg,#78dd72,#ffd35a)}
-.muscle-label{text-align:center;font-size:10px;color:#9ba493;margin-top:4px}
-
-.capture-card{display:flex;flex-direction:column;justify-content:space-between}
-.capture-top{display:flex;justify-content:space-between;align-items:center}
-.capture-power{font-size:24px;font-weight:1000;color:#ffe06b}
-.capture-sub{font-size:11px;color:#9da493}
-.target{
-  display:flex;align-items:center;gap:10px;margin-top:8px;padding:8px;border-radius:14px;background:rgba(255,255,255,.045);min-height:70px
+.mon-slot{
+  height:34px;min-width:0;border-radius:7px;background:#eadcb6;border:1px solid #d7bd78;
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+  filter:saturate(.55);opacity:.48;transition:.25s ease
 }
-.creature-icon{width:55px;height:55px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;background:radial-gradient(circle,#ffe89b,#d79535);box-shadow:0 0 18px rgba(255,208,92,.15)}
-.target-name{font-size:17px;font-weight:1000}.target-hp{font-size:11px;color:#b8c0b0;margin-top:2px}
-.powerbar{height:10px;background:#202c22;border-radius:999px;overflow:hidden;margin-top:8px}.powerbar>div{height:100%;width:0;background:linear-gradient(90deg,#ff9148,#ffe36f,#8cf783);transition:.25s}
-.collection{font-size:11px;color:#d0d4c3;margin-top:6px}
+.mon-slot.caught{
+  background:linear-gradient(#fff4ae,#f2c55d);border-color:#bf8138;
+  filter:none;opacity:1;transform:translateY(-1px);box-shadow:0 2px 5px rgba(114,66,40,.2)
+}
+.mon-slot.just-caught{animation:slotPop .55s ease}
+@keyframes slotPop{0%{transform:scale(.2) rotate(-18deg)}55%{transform:scale(1.28) rotate(5deg)}100%{transform:scale(1)}}
+.time-attack-head{
+  display:none;flex:none;height:48px;border-radius:15px;
+  background:linear-gradient(90deg,#6c234b,#b1375e,#d88638);
+  border:2px solid #ffd877;color:white;padding:4px 11px;
+  align-items:center;justify-content:space-between;box-shadow:0 6px 16px rgba(102,33,70,.22)
+}
+.time-attack-head.show{display:flex}
+.ta-label{font-size:11px;font-weight:1000;letter-spacing:1.8px;color:#ffeaae}
+.ta-timer{font-variant-numeric:tabular-nums;font-size:27px;font-weight:1000;letter-spacing:1px;text-shadow:0 2px 0 #6e2947}
+.ta-score{text-align:right;font-size:10px;color:#ffe9c0}.ta-score b{display:block;font-size:17px;color:white}
 
-.game-card{position:relative;overflow:hidden;border:1px solid rgba(255,229,150,.17);border-radius:28px;background:linear-gradient(rgba(18,29,20,.94),rgba(18,29,20,.96));padding:17px 15px 16px;box-shadow:0 12px 28px rgba(0,0,0,.34)}
-.stage-line{display:flex;align-items:center;justify-content:space-between;color:#adb6a5;font-size:11px;font-weight:850}
-.music-btn{width:38px;height:38px;border-radius:50%;background:#263528;color:#f7d575;font-size:17px;border:1px solid var(--line)}
-.question-wrap{text-align:center;margin-top:2px}
-.question-tag{font-size:11px;color:#e0c776;font-weight:950;letter-spacing:2px}
-.question{font-variant-numeric:tabular-nums;white-space:nowrap;margin:7px 0 4px;font-size:clamp(66px,18vw,98px);line-height:1;font-weight:1000;letter-spacing:-4px;color:#fff9df;text-shadow:0 4px 0 #273126}
-.message{min-height:27px;font-size:17px;font-weight:1000}.message.good{color:#98ff8e}.message.bad{color:#ff857d}
-.answer{height:82px;margin:12px 0 13px;border:3px solid #d9c47d;border-radius:18px;background:#09100b;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums;font-size:50px;font-weight:1000;color:#ffe576;box-shadow:inset 0 0 20px rgba(0,0,0,.75)}
-.answer.empty{color:#596457}
-.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.key{min-height:79px;border-radius:17px;border:2px solid #bd9f59;background:linear-gradient(#f9e6a5,#d6b65c);color:#172017;font-size:40px;line-height:1;font-weight:1000;box-shadow:0 5px 0 #725424,0 8px 16px rgba(0,0,0,.2)}
-.key:active{transform:translateY(4px);box-shadow:0 1px 0 #725424}
-.key.utility{font-size:16px;background:linear-gradient(#445744,#2d3c30);color:#e8e9d8;border-color:#637264;box-shadow:0 5px 0 #19221a}
-.hint{display:none;margin-top:14px;padding:13px;border-radius:17px;background:#172319;border:1px solid #56664f}
-.hint.show{display:block}.hint-title{font-weight:1000;color:#ffd669;font-size:16px}.hint-text{font-size:13px;line-height:1.5;color:#d7d7bf;margin:5px 0 10px}
-.groups{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;max-height:145px;overflow:auto}
-.group{width:55px;min-height:55px;border:2px solid #9e8149;border-radius:12px;padding:6px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-content:center;background:#0e1710}
-.dot{width:8px;height:8px;border-radius:50%;background:#ffd35a}
-.record-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px}
-.record{background:rgba(0,0,0,.17);border:1px solid var(--line);padding:8px 5px;border-radius:11px;text-align:center}
-.record b{display:block;color:#f6d879;font-size:16px}.record span{font-size:10px;color:#9da493}
+/* compact chase */
+.chase{
+  flex:none;height:76px;border-radius:18px;border:2px solid rgba(139,83,49,.18);
+  background:linear-gradient(180deg,rgba(255,249,220,.95),rgba(251,221,150,.95));
+  box-shadow:0 8px 20px rgba(95,55,58,.12);padding:7px 10px 8px;position:relative;overflow:hidden
+}
+.chase-top{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:900;color:#765b5a}
+.chase-track{position:relative;height:47px;margin-top:3px}
+.track-line{position:absolute;left:17px;right:17px;top:25px;height:5px;border-radius:999px;background:#d5ad57;box-shadow:inset 0 1px 2px rgba(86,50,35,.15)}
+.track-fill{position:absolute;left:17px;top:25px;height:5px;border-radius:999px;background:linear-gradient(90deg,#10a0a0,#f2a343,#d94f6d);width:0;transition:width .35s ease}
+.trainer-mini{
+  --x:0%; --muscle:0;
+  position:absolute;left:17px;top:0;width:38px;height:42px;transform:translateX(var(--x));transition:transform .45s cubic-bezier(.2,.8,.2,1);
+}
+.tm-head{position:absolute;left:10px;top:1px;width:17px;height:17px;border-radius:50%;background:#efbd93;border:2px solid #5d4032}
+.tm-cap{position:absolute;left:6px;top:-2px;width:26px;height:10px;border-radius:10px 10px 3px 3px;background:#d94449;border:2px solid #5a3436}
+.tm-body{position:absolute;left:8px;top:17px;width:22px;height:20px;border-radius:6px;background:#2f6cb2;border:2px solid #364253;transform:scaleX(calc(1 + var(--muscle)*.18))}
+.tm-arm{position:absolute;top:19px;width:7px;height:18px;border-radius:6px;background:#efbd93;border:2px solid #5d4032}
+.tm-arm.l{left:2px;transform:rotate(17deg) scaleX(calc(1 + var(--muscle)*.32))}
+.tm-arm.r{right:2px;transform:rotate(-17deg) scaleX(calc(1 + var(--muscle)*.32))}
+.target-mini{position:absolute;right:8px;top:2px;width:45px;text-align:center}
+.target-icon{height:34px;display:flex;align-items:center;justify-content:center;font-size:28px;filter:drop-shadow(0 3px 4px rgba(89,49,51,.15))}
+.target-name{font-size:9px;font-weight:1000;color:#6d4453;white-space:nowrap}
+.finish-label{font-size:9px;color:#886f67}
 
-/* capture modal */
-.capture-modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.74);backdrop-filter:blur(5px)}
+/* main card */
+.game-card{
+  flex:1;min-height:0;border-radius:22px;border:2px solid rgba(138,78,51,.16);
+  background:rgba(255,250,231,.96);box-shadow:0 12px 28px rgba(98,54,56,.18);
+  padding:9px 10px 10px;display:flex;flex-direction:column;overflow:hidden
+}
+.stage-line{height:28px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#8b6d65;font-weight:900;flex:none}
+.music-btn{width:34px;height:34px;border-radius:50%;background:#0f8589;color:white;font-size:16px;box-shadow:0 3px 0 #075b5e}
+.question-wrap{flex:none;text-align:center}
+.tag{font-size:9px;letter-spacing:2px;color:#9a6c34;font-weight:950}
+.question{
+  margin:1px 0 0;font-size:clamp(54px,14vw,78px);line-height:1;font-weight:1000;
+  letter-spacing:-3px;color:#3b2944;font-variant-numeric:tabular-nums;white-space:nowrap;
+  text-shadow:0 2px 0 rgba(255,255,255,.8)
+}
+.message{min-height:22px;font-size:14px;font-weight:1000;color:#775a65}.message.good{color:#16865d}.message.bad{color:#c83d48}
+.answer{
+  flex:none;height:58px;margin:5px 0 7px;border:3px solid #c89b42;border-radius:15px;background:#fff7d4;
+  display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:1000;color:#5a354c;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.6);font-variant-numeric:tabular-nums
+}
+.answer.empty{color:#c8af79}
+.keys{
+  flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:7px
+}
+.key{
+  min-height:0;border-radius:15px;border:2px solid #d4aa51;background:linear-gradient(#fff7c5,#f0cc6b);
+  color:#3e2c43;font-size:clamp(28px,7vw,38px);font-weight:1000;box-shadow:0 3px 0 #ae792d
+}
+.key:active{transform:translateY(2px);box-shadow:0 1px 0 #ae792d}
+.key.utility{font-size:13px;background:linear-gradient(#42b7b7,#138287);border-color:#0d7277;color:white;box-shadow:0 3px 0 #07575a}
+.bottomline{height:27px;flex:none;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:6px}
+.rec{border-radius:9px;background:#fff2c9;border:1px solid #e5c779;text-align:center;padding:3px 2px;font-size:9px;color:#8d6e66}
+.rec b{display:block;font-size:13px;color:#7c4056;line-height:1.1}
+
+/* wrong modal */
+.modal{display:none;position:fixed;inset:0;z-index:100;align-items:center;justify-content:center;padding:18px;background:rgba(53,31,49,.46);backdrop-filter:blur(5px)}
+.modal.show{display:flex}
+.modal-card{
+  width:min(100%,420px);max-height:80vh;overflow:auto;border-radius:24px;padding:20px 16px 16px;
+  background:#fffaf0;border:3px solid #e3b95b;box-shadow:0 24px 60px rgba(60,31,45,.35);text-align:center
+}
+.modal-title{font-size:23px;font-weight:1000;color:#a13d54;margin-bottom:6px}
+.modal-eq{font-size:31px;font-weight:1000;color:#3f2d47;margin-bottom:5px}
+.modal-text{font-size:14px;line-height:1.5;color:#745c64}
+.groups{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:12px}
+.group{width:50px;min-height:50px;border:2px solid #d39e43;border-radius:12px;padding:6px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-content:center;background:#fff5c9}
+.dot{width:8px;height:8px;border-radius:50%;background:#0f8d90}
+.tap-guide{margin-top:14px;font-size:12px;color:#a08179;font-weight:900}
+
+/* capture + fx */
+.capture-modal{display:none;position:fixed;inset:0;z-index:110;align-items:center;justify-content:center;background:rgba(46,24,43,.52);backdrop-filter:blur(4px)}
 .capture-modal.show{display:flex}
-.capture-box{width:min(100%,420px);background:#152019;border:1px solid rgba(255,226,137,.25);border-radius:24px;padding:22px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.5)}
-.capture-mon{font-size:70px;margin:5px 0 3px}.capture-box h2{margin:4px 0;font-size:27px}.capture-box p{color:#bdc4b5;font-size:14px;line-height:1.5}
-.capture-ball{width:78px;height:78px;margin:15px auto;border-radius:50%;background:linear-gradient(#e95a4e 0 47%,#252525 47% 55%,#f5f1df 55%);border:5px solid #242424;position:relative;animation:shake 1s ease}
-.capture-ball:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:20px;height:20px;border-radius:50%;background:white;border:5px solid #242424}
-@keyframes shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-18deg)}40%{transform:rotate(18deg)}60%{transform:rotate(-12deg)}80%{transform:rotate(10deg)}}
-.flash{position:fixed;inset:0;pointer-events:none;background:rgba(172,255,114,.13);opacity:0;z-index:50}.flash.go{animation:flash .35s ease}
-.burst{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%) scale(.6);z-index:60;pointer-events:none;opacity:0;font-size:42px;font-weight:1000;color:#ffe068;text-shadow:0 4px 0 #923f19}.burst.go{animation:burst .65s ease}
+.capture-box{width:min(88%,380px);background:#fff9df;border:3px solid #e2b350;border-radius:24px;padding:20px;text-align:center;box-shadow:0 22px 60px rgba(62,32,49,.32)}
+.capture-mon{font-size:60px}.capture-box h2{margin:5px 0;color:#813b59}.capture-box p{margin:4px 0;color:#785f64;font-size:13px}
+.flash{position:fixed;inset:0;z-index:90;pointer-events:none;background:rgba(255,238,138,.28);opacity:0}.flash.go{animation:flash .42s ease}
+.burst{position:fixed;z-index:95;left:50%;top:44%;transform:translate(-50%,-50%);pointer-events:none;opacity:0;font-size:38px;font-weight:1000;color:#fff4a8;text-shadow:0 4px 0 #8a3e56,0 0 18px rgba(255,241,163,.7)}
+.burst.go{animation:burst .7s ease}
 @keyframes flash{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
-@keyframes burst{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}35%{opacity:1;transform:translate(-50%,-50%) scale(1.16)}100%{opacity:0;transform:translate(-50%,-60%) scale(1)}}
+@keyframes burst{0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}35%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}100%{opacity:0;transform:translate(-50%,-60%) scale(1)}}
 
-@media(max-width:390px){
- .hero-zone{grid-template-columns:116px 1fr}.trainer{height:118px}.key{min-height:73px;font-size:36px}.question{font-size:67px}.answer{height:72px;font-size:45px}
-}
-@media(max-height:780px){
- .hero-zone{margin-bottom:7px}.trainer{height:106px}.head{top:6px}.cap{top:0}.body{height:58px}.arm{height:45px}.question{font-size:64px}.answer{height:66px;margin:8px 0 9px}.key{min-height:62px;font-size:33px}
+@media(max-height:700px){
+  .topbar{height:32px}.chase{height:72px}.chase-track{height:39px}.track-line,.track-fill{top:20px}
+  .trainer-mini{transform:translateX(var(--x)) scale(.9);transform-origin:left top}.target-mini{top:-1px}
+  .stage-line{height:24px}.music-btn{width:30px;height:30px}.question{font-size:52px}.answer{height:48px;font-size:34px;margin:3px 0 5px}
+  .bottomline{height:24px;margin-top:4px}.key{border-radius:12px}
 }
 </style>
 </head>
 <body>
 
 <section id="startScreen" class="screen active">
-  <div class="sky"></div><div class="moon"></div>
-  <div class="house"><div class="window l"></div><div class="window r"></div><div class="sign">POKÉMON MATH CLUBHOUSE</div></div>
+  <div class="palace-bg"></div>
   <div class="start-card">
-    <div class="logo-small">RETRO MATH ADVENTURE</div>
-    <h1 id="startTitle">구구단 포켓몬 탐험대</h1>
-    <div id="startSub" class="sub">정답을 맞힐수록 포획력이 강해진다!</div>
-    <div id="newUserArea">
-      <div class="name-label">PLAYER NAME</div>
-      <input id="nameInput" class="name-input" maxlength="10" placeholder="이름 입력" autocomplete="off">
+    <div class="logo">PALACE MATH QUEST</div>
+    <h1 id="startTitle">구구단 포켓몬 궁전</h1>
+    <div id="startSub" class="sub">정답을 맞히며 포켓몬에게 다가가자.</div>
+    <div id="newUser">
+      <div class="label">PLAYER NAME</div>
+      <input id="nameInput" class="name-input" maxlength="10" placeholder="이름 입력">
     </div>
-    <div id="resumeStats" class="resume-stats">
-      <div class="mini"><b id="resumeScore">0</b><span>누적 점수</span></div>
-      <div class="mini"><b id="resumeCaught">0</b><span>잡은 포켓몬</span></div>
-      <div class="mini"><b id="resumeRate">0%</b><span>정답률</span></div>
+    <div id="resume" class="resume">
+      <div class="mini"><b id="rScore">0</b><span>점수</span></div>
+      <div class="mini"><b id="rCaught">0</b><span>포획</span></div>
+      <div class="mini"><b id="rRate">0%</b><span>정답률</span></div>
     </div>
     <button id="startBtn" class="primary" type="button">모험 시작!</button>
-    <button id="changeUser" class="link-btn" type="button">플레이어 다시 등록</button>
+    <button id="changeUser" class="link" type="button">플레이어 다시 등록</button>
   </div>
 </section>
 
@@ -162,181 +239,192 @@ button{border:0;cursor:pointer;touch-action:manipulation}
   <div class="shell">
     <header class="topbar">
       <div class="player"><small>TRAINER</small><span id="playerName">박세현</span></div>
-      <div class="stat-row">
+      <div class="stats">
         <div class="pill">⭐ <span id="score">0</span></div>
         <div class="pill">🔥 <span id="streak">0</span></div>
       </div>
     </header>
 
-    <section class="hero-zone">
-      <div class="trainer-card">
-        <div class="trainer-title">지우 · POWER UP</div>
-        <div id="trainer" class="trainer">
-          <div class="cap"></div><div class="head"></div>
-          <div class="arm l"></div><div class="arm r"></div>
-          <div class="body"></div><div class="leg l"></div><div class="leg r"></div>
-        </div>
-        <div class="muscle-meter"><div id="muscleBar"></div></div>
-        <div id="muscleLabel" class="muscle-label">근력 Lv. 1</div>
-      </div>
+    <section id="collectionBar" class="collection-bar" aria-label="포켓몬 수집 현황"></section>
 
-      <div class="capture-card">
-        <div>
-          <div class="capture-top">
-            <div>
-              <div class="capture-title">CAPTURE POWER</div>
-              <div id="powerText" class="capture-power">0</div>
-            </div>
-            <div class="capture-sub">정답을 맞히면<br>포획력이 상승!</div>
-          </div>
-          <div class="target">
-            <div id="targetIcon" class="creature-icon">⚡</div>
-            <div>
-              <div id="targetName" class="target-name">피카츄</div>
-              <div id="targetHP" class="target-hp">포획까지 5정답</div>
-            </div>
-          </div>
-          <div class="powerbar"><div id="powerBar"></div></div>
+    <section id="timeAttackHead" class="time-attack-head">
+      <div>
+        <div class="ta-label">⚡ TIME ATTACK</div>
+        <div style="font-size:10px;color:#ffe7bd">20마리 포획 완료 · 무한 랜덤</div>
+      </div>
+      <div id="taTimer" class="ta-timer">00:00.0</div>
+      <div class="ta-score">TIME SCORE<b id="taScore">0</b></div>
+    </section>
+
+    <section id="chase" class="chase">
+      <div class="chase-top">
+        <span>다음 포켓몬까지</span>
+        <span id="distanceText">20문제 남음</span>
+      </div>
+      <div class="chase-track">
+        <div class="track-line"></div>
+        <div id="trackFill" class="track-fill"></div>
+        <div id="trainerMini" class="trainer-mini">
+          <div class="tm-cap"></div><div class="tm-head"></div>
+          <div class="tm-arm l"></div><div class="tm-arm r"></div><div class="tm-body"></div>
         </div>
-        <div id="collection" class="collection">도감 0 / 12</div>
+        <div class="target-mini">
+          <div id="targetIcon" class="target-icon">⚡</div>
+          <div id="targetName" class="target-name">피카츄</div>
+        </div>
       </div>
     </section>
 
     <main class="game-card">
       <div class="stage-line">
-        <span>2단 ~ 9단 · RANDOM BATTLE</span>
-        <button id="musicBtn" class="music-btn" type="button" aria-label="배경음 켜기/끄기">♫</button>
+        <span>2단 ~ 9단 · RANDOM QUEST</span>
+        <button id="musicBtn" class="music-btn" type="button">♫</button>
       </div>
+
       <div class="question-wrap">
-        <div class="question-tag">MULTIPLICATION</div>
+        <div class="tag">MULTIPLICATION</div>
         <div id="question" class="question">7 × 8</div>
         <div id="message" class="message">답을 눌러봐!</div>
       </div>
+
       <div id="answerDisplay" class="answer empty">?</div>
 
       <div class="keys">
-        <button class="key" type="button" data-num="1">1</button>
-        <button class="key" type="button" data-num="2">2</button>
-        <button class="key" type="button" data-num="3">3</button>
-        <button class="key" type="button" data-num="4">4</button>
-        <button class="key" type="button" data-num="5">5</button>
-        <button class="key" type="button" data-num="6">6</button>
-        <button class="key" type="button" data-num="7">7</button>
-        <button class="key" type="button" data-num="8">8</button>
-        <button class="key" type="button" data-num="9">9</button>
-        <button id="clearBtn" class="key utility" type="button">지우기</button>
-        <button class="key" type="button" data-num="0">0</button>
-        <button id="backBtn" class="key utility" type="button">⌫</button>
+        <button class="key" data-num="1">1</button>
+        <button class="key" data-num="2">2</button>
+        <button class="key" data-num="3">3</button>
+        <button class="key" data-num="4">4</button>
+        <button class="key" data-num="5">5</button>
+        <button class="key" data-num="6">6</button>
+        <button class="key" data-num="7">7</button>
+        <button class="key" data-num="8">8</button>
+        <button class="key" data-num="9">9</button>
+        <button id="clearBtn" class="key utility">지우기</button>
+        <button class="key" data-num="0">0</button>
+        <button id="backBtn" class="key utility">⌫</button>
       </div>
 
-      <div id="hint" class="hint">
-        <div class="hint-title">🦖 그림으로 다시 보자</div>
-        <div id="hintText" class="hint-text"></div>
-        <div id="groups" class="groups"></div>
-      </div>
-
-      <div class="record-strip">
-        <div class="record"><b id="correctCount">0</b><span>정답</span></div>
-        <div class="record"><b id="accuracy">0%</b><span>정답률</span></div>
-        <div class="record"><b id="caughtCount">0</b><span>포획</span></div>
+      <div class="bottomline">
+        <div class="rec"><b id="correctCount">0</b>정답</div>
+        <div class="rec"><b id="accuracy">0%</b>정답률</div>
+        <div class="rec"><b id="caughtCount">0 / 20</b>포획</div>
       </div>
     </main>
   </div>
 </section>
 
+<div id="wrongModal" class="modal">
+  <div class="modal-card">
+    <div class="modal-title">아깝다! 이렇게 생각해봐 👀</div>
+    <div id="wrongEq" class="modal-eq">7 × 8 = 56</div>
+    <div id="wrongText" class="modal-text"></div>
+    <div id="wrongGroups" class="groups"></div>
+    <div class="tap-guide">화면 아무 곳이나 한 번 누르면 다음 문제</div>
+  </div>
+</div>
+
 <div id="captureModal" class="capture-modal">
   <div class="capture-box">
     <div id="captureIcon" class="capture-mon">⚡</div>
     <h2 id="captureTitle">피카츄 포획!</h2>
-    <div class="capture-ball"></div>
-    <p id="captureDesc">구구단의 힘으로 포켓몬을 잡았다!</p>
+    <p id="captureDesc">구구단 파워로 포켓몬을 잡았다!</p>
   </div>
 </div>
+
 <div id="flash" class="flash"></div>
 <div id="burst" class="burst">POWER UP!</div>
 
-<audio id="bgm" src="caprice-for-lute.mp3" loop preload="auto"></audio>
+<audio id="licensedBgm" src="caprice-for-lute.mp3" loop preload="auto"></audio>
 
 <script>
 (() => {
 "use strict";
-const SAVE_KEY="sehyeonPokemonMath_v2";
-const defaultSave={name:"",score:0,correct:0,wrong:0,streak:0,bestStreak:0,capturePower:0,caught:[],targetIndex:0,lastA:0,lastB:0,music:true};
+
+const SAVE_KEY="sehyeonPalaceMath_v3";
+const base={name:"",score:0,correct:0,wrong:0,streak:0,best:0,caught:[],progress:0,lastA:0,lastB:0,music:true,timeAttack:false,timeAttackScore:0,timeAttackStart:0};
 let save=load();
 let A=2,B=2,typed="",locked=false;
-let audioCtx=null;
+let audioCtx=null,bgmTimer=null,bgmStep=0,usingFileBgm=false;
+let timerRAF=null;
 
 const pokemon=[
- {name:"피카츄",icon:"⚡",need:5},
- {name:"이상해씨",icon:"🌱",need:7},
- {name:"파이리",icon:"🔥",need:8},
- {name:"꼬부기",icon:"💧",need:9},
- {name:"푸린",icon:"🎵",need:10},
- {name:"고라파덕",icon:"🌀",need:11},
- {name:"나옹",icon:"🪙",need:12},
- {name:"이브이",icon:"✨",need:13},
- {name:"잠만보",icon:"💤",need:14},
- {name:"고오스",icon:"👻",need:15},
- {name:"리자몽",icon:"🐉",need:18},
- {name:"뮤",icon:"🌟",need:22}
+ {name:"피카츄",icon:"⚡"},{name:"이상해씨",icon:"🌱"},{name:"파이리",icon:"🔥"},{name:"꼬부기",icon:"💧"},
+ {name:"이브이",icon:"✨"},{name:"푸린",icon:"🎵"},{name:"고라파덕",icon:"🌀"},{name:"나옹",icon:"🪙"},
+ {name:"잠만보",icon:"💤"},{name:"고오스",icon:"👻"},{name:"리자몽",icon:"🐉"},{name:"뮤",icon:"🌟"},
+ {name:"치코리타",icon:"🍃"},{name:"브케인",icon:"🌋"},{name:"리아코",icon:"🌊"},{name:"토게피",icon:"🥚"},
+ {name:"메리프",icon:"💡"},{name:"에브이",icon:"🔮"},{name:"블래키",icon:"🌙"},{name:"루기아",icon:"🪽"}
 ];
+const CATCH_EVERY=20;
+const TOTAL_POKEMON=20;
 
 const $=id=>document.getElementById(id);
-function load(){try{const raw=localStorage.getItem(SAVE_KEY);return raw?{...defaultSave,...JSON.parse(raw)}:{...defaultSave};}catch(e){return {...defaultSave};}}
+function load(){try{const r=localStorage.getItem(SAVE_KEY);return r?{...base,...JSON.parse(r)}:{...base}}catch(e){return {...base}}}
 function persist(){localStorage.setItem(SAVE_KEY,JSON.stringify(save))}
-function rate(){const t=save.correct+save.wrong;return t?Math.round(save.correct/t*100):0}
-function currentTarget(){return pokemon[Math.min(save.targetIndex,pokemon.length-1)]}
+function acc(){const t=save.correct+save.wrong;return t?Math.round(save.correct/t*100):0}
+function target(){return pokemon[Math.min(save.caught.length,pokemon.length-1)]}
 function setupStart(){
  if(save.name){
-   $("newUserArea").style.display="none";$("resumeStats").classList.add("show");$("changeUser").style.display="block";
-   $("startTitle").textContent=save.name+"의 포켓몬 구구단";
-   $("startSub").textContent="지난 기록에 이어서 포획 모험을 계속하자!";
+   $("newUser").style.display="none";$("resume").classList.add("show");$("changeUser").style.display="block";
+   $("startTitle").textContent=save.name+"의 포켓몬 궁전";
+   $("startSub").textContent="지난 기록부터 이어서 포켓몬에게 다가가자!";
    $("startBtn").textContent="이어하기";
-   $("resumeScore").textContent=save.score;$("resumeCaught").textContent=save.caught.length;$("resumeRate").textContent=rate()+"%";
+   $("rScore").textContent=save.score;$("rCaught").textContent=save.caught.length+"/20";$("rRate").textContent=acc()+"%";
  }else{
-   $("newUserArea").style.display="block";$("resumeStats").classList.remove("show");$("changeUser").style.display="none";
+   $("newUser").style.display="block";$("resume").classList.remove("show");$("changeUser").style.display="none";
  }
 }
 function enterGame(){
  if(!save.name){
-   const n=$("nameInput").value.trim();if(!n){$("nameInput").focus();return}
+   const n=$("nameInput").value.trim(); if(!n){$("nameInput").focus();return}
    save.name=n;persist();
  }
- $("playerName").textContent=save.name;$("startScreen").classList.remove("active");$("gameScreen").classList.add("active");
- updateHUD();tryStartMusic();newQuestion();
+ $("playerName").textContent=save.name;
+ $("startScreen").classList.remove("active");$("gameScreen").classList.add("active");
+ updateHUD();startBgmFromGesture();
+ if(save.timeAttack) startTimeAttack(false);
+ newQuestion();
 }
-function changeUser(){
- if(!confirm("현재 기록을 지우고 새 플레이어로 시작할까?"))return;
- localStorage.removeItem(SAVE_KEY);save={...defaultSave};$("nameInput").value="";setupStart();
+function renderCollection(){
+ const bar=$("collectionBar");bar.innerHTML="";
+ for(let i=0;i<TOTAL_POKEMON;i++){
+   const slot=document.createElement("div");slot.className="mon-slot"+(i<save.caught.length?" caught":"");
+   slot.title=pokemon[i].name;
+   slot.textContent=i<save.caught.length?pokemon[i].icon:"·";
+   bar.appendChild(slot);
+ }
 }
 function updateHUD(){
- $("score").textContent=save.score;$("streak").textContent=save.streak;$("correctCount").textContent=save.correct;$("accuracy").textContent=rate()+"%";$("caughtCount").textContent=save.caught.length;
- const target=currentTarget();$("targetName").textContent=target.name;$("targetIcon").textContent=target.icon;
- const remain=Math.max(0,target.need-save.capturePower);$("targetHP").textContent=remain?("포획까지 "+remain+"정답"):"포획 가능!";
- $("powerText").textContent=save.capturePower+" / "+target.need;$("powerBar").style.width=Math.min(100,save.capturePower/target.need*100)+"%";
- $("collection").textContent="도감 "+save.caught.length+" / "+pokemon.length;
- const muscle=Math.min(1,save.correct/180);
- $("trainer").style.setProperty("--muscle",muscle.toFixed(3));
- $("muscleBar").style.width=(muscle*100)+"%";
- $("muscleLabel").textContent="근력 Lv. "+(1+Math.floor(save.correct/20));
+ $("score").textContent=save.score;$("streak").textContent=save.streak;
+ $("correctCount").textContent=save.correct;$("accuracy").textContent=acc()+"%";$("caughtCount").textContent=save.caught.length+" / 20";
+ renderCollection();
+
+ if(save.timeAttack){
+   $("collectionBar").style.display="none";$("timeAttackHead").classList.add("show");$("chase").style.display="none";
+   $("taScore").textContent=save.timeAttackScore;
+ }else{
+   $("collectionBar").style.display="grid";$("timeAttackHead").classList.remove("show");$("chase").style.display="block";
+   const t=target(), pct=Math.min(1,save.progress/CATCH_EVERY);
+   $("targetIcon").textContent=t.icon;$("targetName").textContent=t.name;
+   $("distanceText").textContent=Math.max(0,CATCH_EVERY-save.progress)+"문제 남음";
+   $("trackFill").style.width=(pct*82)+"%";
+   $("trainerMini").style.setProperty("--x",(pct*390)+"%");
+   $("trainerMini").style.setProperty("--muscle",Math.min(1,save.correct/600).toFixed(3));
+ }
  $("musicBtn").textContent=save.music?"♫":"♪";
  persist();
 }
 function render(){if(!typed){$("answerDisplay").textContent="?";$("answerDisplay").classList.add("empty")}else{$("answerDisplay").textContent=typed;$("answerDisplay").classList.remove("empty")}}
-function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a}
 function newQuestion(){
- locked=false;typed="";let tries=0;
- do{A=rand(2,9);B=rand(1,9);tries++;}while(A===save.lastA&&B===save.lastB&&tries<20);
+ locked=false;typed="";let n=0;
+ do{A=rnd(2,9);B=rnd(1,9);n++}while(A===save.lastA&&B===save.lastB&&n<20);
  save.lastA=A;save.lastB=B;persist();
- $("question").textContent=A+" × "+B;$("message").textContent="답을 눌러봐!";$("message").className="message";$("hint").classList.remove("show");$("groups").innerHTML="";render();
+ $("question").textContent=A+" × "+B;$("message").textContent="답을 눌러봐!";$("message").className="message";render();
 }
-function showHint(){
- $("hintText").innerHTML="<b>"+A+" × "+B+"</b>는 <b>"+A+"개씩 "+B+"묶음</b>이야. 모두 세면 <b>"+(A*B)+"개</b>!";
- const groups=$("groups");groups.innerHTML="";
- for(let g=0;g<B;g++){const box=document.createElement("div");box.className="group";for(let i=0;i<A;i++){const dot=document.createElement("span");dot.className="dot";box.appendChild(dot)}groups.appendChild(box)}
- $("hint").classList.add("show");
+function press(n){
+ if(locked||typed.length>=2)return;
+ typed+=String(n);render();tapSfx();evaluate();
 }
-function press(n){if(locked||typed.length>=2)return;typed+=String(n);render();tapSfx();evaluate()}
 function evaluate(){
  const ans=String(A*B);
  if(typed===ans){correct();return}
@@ -344,66 +432,213 @@ function evaluate(){
  wrong();
 }
 function correct(){
- locked=true;save.correct++;save.streak++;save.bestStreak=Math.max(save.bestStreak,save.streak);
- const bonus=Math.min(save.streak-1,5)*2;save.score+=10+bonus;save.capturePower++;
- $("message").textContent="정답! 포획력 +1";$("message").className="message good";
- correctSfx();powerFx();updateHUD();
- const target=currentTarget();
- if(save.capturePower>=target.need){setTimeout(capturePokemon,500)}else setTimeout(newQuestion,820);
+ locked=true;save.correct++;save.streak++;save.best=Math.max(save.best,save.streak);
+ const bonus=Math.min(save.streak-1,5)*2;save.score+=10+bonus;
+ if(save.timeAttack){
+   save.timeAttackScore += 10+bonus;
+   $("message").textContent=save.streak>=5?save.streak+" COMBO!":"정답!";
+   $("message").className="message good";
+   updateHUD();grandCorrectSfx();powerFx();
+   setTimeout(newQuestion,430);
+   return;
+ }
+ save.progress++;
+ $("message").textContent=save.streak>=5?save.streak+" COMBO! 포켓몬에게 더 가까이!":"정답! 한 걸음 전진!";
+ $("message").className="message good";
+ updateHUD();grandCorrectSfx();powerFx();
+ if(save.progress>=CATCH_EVERY)setTimeout(capture,500);
+ else setTimeout(newQuestion,650);
 }
 function wrong(){
- locked=true;save.wrong++;save.streak=0;save.score=Math.max(0,save.score-2);
- $("message").textContent="아깝다! 그림을 보고 다시!";$("message").className="message bad";wrongSfx();showHint();updateHUD();
- setTimeout(()=>{locked=false;typed="";render();$("message").textContent="그림을 보고 다시 맞혀봐!";$("message").className="message"},950);
+ locked=true;save.wrong++;save.streak=0;save.score=Math.max(0,save.score-2);updateHUD();grandWrongSfx();
+ $("wrongEq").textContent=A+" × "+B+" = "+(A*B);
+ $("wrongText").innerHTML="<b>"+A+" × "+B+"</b>는 <b>"+A+"개씩 "+B+"묶음</b>이라는 뜻이야.<br>아래 묶음을 하나씩 세면 답은 <b>"+(A*B)+"</b>!";
+ const wrap=$("wrongGroups");wrap.innerHTML="";
+ for(let g=0;g<B;g++){
+   const box=document.createElement("div");box.className="group";
+   for(let i=0;i<A;i++){const dot=document.createElement("span");dot.className="dot";box.appendChild(dot)}
+   wrap.appendChild(box);
+ }
+ $("wrongModal").classList.add("show");
 }
-function capturePokemon(){
- const target=currentTarget();
- if(!save.caught.includes(target.name))save.caught.push(target.name);
- $("captureIcon").textContent=target.icon;$("captureTitle").textContent=target.name+" 포획!";
- $("captureDesc").textContent=save.name+"의 구구단 파워가 더 강해졌다!";
- $("captureModal").classList.add("show");captureSfx();
- save.capturePower=0;
- if(save.targetIndex<pokemon.length-1)save.targetIndex++;
- updateHUD();
- setTimeout(()=>{$("captureModal").classList.remove("show");newQuestion()},1800);
+function dismissWrong(){
+ if(!$("wrongModal").classList.contains("show"))return;
+ $("wrongModal").classList.remove("show");newQuestion();
 }
-function clearAnswer(){if(!locked){typed="";render();tapSfx()}}
-function backspace(){if(!locked){typed=typed.slice(0,-1);render();tapSfx()}}
-function powerFx(){const f=$("flash");f.classList.remove("go");void f.offsetWidth;f.classList.add("go");const b=$("burst");b.textContent=save.streak>=5?save.streak+" COMBO!":"POWER UP!";b.classList.remove("go");void b.offsetWidth;b.classList.add("go")}
+function capture(){
+ const t=target();
+ if(save.caught.length<TOTAL_POKEMON) save.caught.push(t.name);
+ save.progress=0;
+ $("captureIcon").textContent=t.icon;$("captureTitle").textContent=t.name+" 포획!";
+ $("captureDesc").textContent="20문제 돌파! "+save.caught.length+" / 20 마리 수집";
+ updateHUD();captureSfx();$("captureModal").classList.add("show");
 
-/* SFX only: original synthesized effects */
-function ctx(){if(audioCtx)return audioCtx;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;audioCtx=new AC();return audioCtx}
-function tone(freq,start,dur,type="square",vol=.03){
- const c=ctx();if(!c)return;if(c.state==="suspended")c.resume();
- const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(vol,c.currentTime+start);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+start+dur);o.connect(g);g.connect(c.destination);o.start(c.currentTime+start);o.stop(c.currentTime+start+dur)
-}
-function tapSfx(){tone(330,0,.035,"square",.01)}
-function correctSfx(){tone(523,0,.07,"square",.04);tone(659,.06,.08,"square",.04);tone(784,.12,.09,"square",.045);tone(1046,.19,.15,"square",.05)}
-function wrongSfx(){tone(196,0,.12,"sawtooth",.026);tone(164,.1,.15,"sawtooth",.023)}
-function captureSfx(){tone(392,0,.08,"square",.04);tone(523,.08,.08,"square",.045);tone(659,.16,.10,"square",.05);tone(784,.27,.18,"square",.055)}
+ const slots=$("collectionBar").children;
+ if(slots[save.caught.length-1]){
+   slots[save.caught.length-1].classList.add("just-caught");
+ }
 
-/* Licensed BGM hook.
-   Place a legitimately obtained file named caprice-for-lute.mp3 beside index.html.
+ if(save.caught.length>=TOTAL_POKEMON){
+   setTimeout(()=>{
+     $("captureModal").classList.remove("show");
+     startTimeAttack(true);
+     newQuestion();
+   },1500);
+ }else{
+   setTimeout(()=>{$("captureModal").classList.remove("show");newQuestion()},1300);
+ }
+}
+function clearAns(){if(!locked){typed="";render();tapSfx()}}
+function back(){if(!locked){typed=typed.slice(0,-1);render();tapSfx()}}
+function powerFx(){
+ const f=$("flash");f.classList.remove("go");void f.offsetWidth;f.classList.add("go");
+ const b=$("burst");b.textContent=save.streak>=5?save.streak+" COMBO!":"ADVANCE!";
+ b.classList.remove("go");void b.offsetWidth;b.classList.add("go")
+}
+
+function formatTime(ms){
+ const total=Math.max(0,ms);
+ const min=Math.floor(total/60000);
+ const sec=Math.floor((total%60000)/1000);
+ const tenth=Math.floor((total%1000)/100);
+ return String(min).padStart(2,"0")+":"+String(sec).padStart(2,"0")+"."+tenth;
+}
+function tickTimer(){
+ if(!save.timeAttack){timerRAF=null;return}
+ const elapsed=Date.now()-save.timeAttackStart;
+ $("taTimer").textContent=formatTime(elapsed);
+ timerRAF=requestAnimationFrame(tickTimer);
+}
+function startTimeAttack(firstTime){
+ save.timeAttack=true;
+ if(firstTime || !save.timeAttackStart) save.timeAttackStart=Date.now();
+ if(firstTime) save.timeAttackScore=0;
+ persist();
+ $("collectionBar").style.display="none";$("chase").style.display="none";$("timeAttackHead").classList.add("show");
+ $("taScore").textContent=save.timeAttackScore;
+ if(timerRAF)cancelAnimationFrame(timerRAF);
+ timerRAF=requestAnimationFrame(tickTimer);
+ setBgmSpeed(1.5);
+}
+function setBgmSpeed(rate){
+ const a=$("licensedBgm");
+ a.playbackRate=rate;
+ if(!usingFileBgm && save.music){
+   stopFallback();
+   startFallbackBgm(rate);
+ }
+}
+function resetPlayer(){
+ if(!confirm("현재 기록을 지우고 새 플레이어로 시작할까?"))return;
+ stopAllBgm();if(timerRAF)cancelAnimationFrame(timerRAF);timerRAF=null;localStorage.removeItem(SAVE_KEY);save={...base};$("nameInput").value="";setupStart();
+}
+
+/* Richer WebAudio SFX */
+function getCtx(){
+ if(audioCtx)return audioCtx;
+ const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;
+ audioCtx=new AC();return audioCtx;
+}
+function tone(freq,start,dur,type="sine",vol=.025,detune=0){
+ const c=getCtx();if(!c)return;if(c.state==="suspended")c.resume();
+ const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.value=freq;o.detune.value=detune;
+ g.gain.setValueAtTime(vol,c.currentTime+start);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+start+dur);
+ o.connect(g);g.connect(c.destination);o.start(c.currentTime+start);o.stop(c.currentTime+start+dur)
+}
+function chord(freqs,start,dur,vol=.018){
+ freqs.forEach((f,i)=>{tone(f,start,dur,"sine",vol, i%2?4:-4);tone(f/2,start,dur*.9,"triangle",vol*.6)})
+}
+function noiseBurst(start,dur,vol=.018){
+ const c=getCtx();if(!c)return;
+ const len=Math.floor(c.sampleRate*dur),buf=c.createBuffer(1,len,c.sampleRate),data=buf.getChannelData(0);
+ for(let i=0;i<len;i++)data[i]=(Math.random()*2-1)*(1-i/len);
+ const src=c.createBufferSource(),g=c.createGain();src.buffer=buf;g.gain.value=vol;src.connect(g);g.connect(c.destination);src.start(c.currentTime+start)
+}
+function tapSfx(){tone(460,0,.025,"triangle",.008)}
+function grandCorrectSfx(){
+ chord([261.63,329.63,392],0,.30,.026);
+ noiseBurst(.02,.11,.010);
+ tone(523.25,.08,.22,"sine",.035);tone(659.25,.15,.28,"sine",.035);tone(783.99,.22,.38,"sine",.04);
+ chord([392,493.88,587.33],.28,.42,.024);
+ tone(1046.5,.36,.42,"sine",.03)
+}
+function grandWrongSfx(){
+ chord([196,233.08,293.66],0,.28,.018);
+ tone(174.61,.12,.35,"triangle",.02);noiseBurst(.03,.09,.008)
+}
+function captureSfx(){
+ chord([261.63,329.63,392],0,.35,.025);
+ chord([329.63,415.30,493.88],.16,.40,.026);
+ chord([392,493.88,587.33],.34,.55,.028);
+ tone(1174.66,.48,.50,"sine",.03)
+}
+
+/* BGM:
+   1) If caprice-for-lute.mp3 exists, use it.
+   2) If missing/unplayable, automatically fall back to an original palace-adventure loop.
 */
-function tryStartMusic(){
- const a=$("bgm");a.volume=.28;
- if(save.music){a.play().catch(()=>{})}
+const bgmNotes={
+ C3:130.81,D3:146.83,E3:164.81,F3:174.61,G3:196,A3:220,Bb3:233.08,
+ C4:261.63,D4:293.66,E4:329.63,F4:349.23,G4:392,A4:440,Bb4:466.16,
+ C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99
+};
+const bgMel=["A4","Bb4","C5","E5","D5","C5","Bb4","A4","G4","A4","C5","D5","C5","Bb4","A4","G4",
+             "F4","G4","A4","C5","Bb4","A4","G4","F4","E4","G4","A4","Bb4","A4","G4","F4","E4"];
+const bgBass=["A3","A3","G3","G3","F3","F3","E3","E3"];
+function bgTick(){
+ if(!save.music||!$("gameScreen").classList.contains("active"))return;
+ const m=bgMel[bgmStep%bgMel.length],bs=bgBass[Math.floor(bgmStep/4)%bgBass.length];
+ tone(bgmNotes[m],0,.19,"triangle",.012);
+ tone(bgmNotes[m]*2,0,.10,"sine",.004);
+ if(bgmStep%2===0)tone(bgmNotes[bs],0,.34,"triangle",.018);
+ if(bgmStep%4===0)chord([bgmNotes[bs],bgmNotes[bs]*1.25,bgmNotes[bs]*1.5],0,.28,.006);
+ bgmStep++;
+}
+function startFallbackBgm(speed){
+ if(bgmTimer)return;
+ const rate=speed||1;
+ const c=getCtx();if(c&&c.state==="suspended")c.resume();
+ bgmStep=0;bgTick();bgmTimer=setInterval(bgTick,225/rate)
+}
+function stopFallback(){if(bgmTimer){clearInterval(bgmTimer);bgmTimer=null}}
+async function startBgmFromGesture(){
+ if(!save.music)return;
+ const a=$("licensedBgm");a.volume=.34;a.playbackRate=save.timeAttack?1.5:1;
+ try{
+   await a.play();usingFileBgm=true;stopFallback();
+ }catch(e){
+   usingFileBgm=false;startFallbackBgm(save.timeAttack?1.5:1);
+ }
+}
+function stopAllBgm(){
+ $("licensedBgm").pause();stopFallback()
 }
 function toggleMusic(){
- save.music=!save.music;persist();const a=$("bgm");
- if(save.music){a.play().catch(()=>{})}else{a.pause()}
+ save.music=!save.music;persist();
+ if(save.music)startBgmFromGesture();else stopAllBgm();
  updateHUD();
 }
-document.addEventListener("visibilitychange",()=>{const a=$("bgm");if(document.hidden)a.pause();else if(save.music&&$("gameScreen").classList.contains("active"))a.play().catch(()=>{})});
+$("licensedBgm").addEventListener("error",()=>{if(save.music){usingFileBgm=false;startFallbackBgm(save.timeAttack?1.5:1)}});
+document.addEventListener("visibilitychange",()=>{
+ if(document.hidden)stopAllBgm();
+ else if(save.music&&$("gameScreen").classList.contains("active"))startBgmFromGesture();
+});
 
 $("startBtn").addEventListener("click",enterGame);
-$("changeUser").addEventListener("click",changeUser);
+$("changeUser").addEventListener("click",resetPlayer);
 $("musicBtn").addEventListener("click",toggleMusic);
-$("clearBtn").addEventListener("click",clearAnswer);
-$("backBtn").addEventListener("click",backspace);
+$("clearBtn").addEventListener("click",clearAns);
+$("backBtn").addEventListener("click",back);
+$("wrongModal").addEventListener("click",dismissWrong);
 document.querySelectorAll("[data-num]").forEach(b=>b.addEventListener("click",()=>press(b.dataset.num)));
 $("nameInput").addEventListener("keydown",e=>{if(e.key==="Enter")enterGame()});
-window.addEventListener("keydown",e=>{if(!$("gameScreen").classList.contains("active"))return;if(/^[0-9]$/.test(e.key))press(e.key);if(e.key==="Backspace")backspace()});
+window.addEventListener("keydown",e=>{
+ if(!$("gameScreen").classList.contains("active"))return;
+ if($("wrongModal").classList.contains("show")){dismissWrong();return}
+ if(/^[0-9]$/.test(e.key))press(e.key);
+ if(e.key==="Backspace")back()
+});
+
 setupStart();
 })();
 </script>

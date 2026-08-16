@@ -1,19 +1,36 @@
-구구단 포켓몬 탐험대 v2
+구구단 포켓몬 궁전 v4
 
-Cloudflare Pages 업로드 파일:
-- index.html
-- _headers
-- caprice-for-lute.mp3  ← 사용자가 합법적으로 보유한 음원 파일을 직접 추가
+게임 단계
+1) COLLECTION MODE
+- 정답 20개마다 포켓몬 1마리 포획
+- 최상단 20칸 수집 바에 왼쪽부터 포켓몬 아이콘 추가
+- 현재 포켓몬까지 남은 정답 수 + 이동 게이지 표시
+- 20마리 포획까지 총 400정답
 
-기능:
-- 이름/점수/정답률/포획 기록 저장
-- 정답마다 포획력 +1
-- 포획력 충족 시 포켓몬 포획 연출
-- 정답 누적에 따라 지우의 팔/상체가 아주 서서히 커짐
-- 정답/오답/포획 효과음
-- BGM ON/OFF
-- 같은 브라우저 localStorage에 이어하기 저장
+2) TIME ATTACK MODE
+- 20마리 포획 즉시 자동 해금
+- 최상단에 00:00.0 형식 실시간 타이머 표시
+- 2~9단 × 1~9 전체 완전 랜덤 문제
+- 정답 전환 속도 단축
+- 별도 TIME SCORE 누적
+- BGM 1.5배속
+- 브라우저 종료 후에도 모드/점수/시작시간 이어짐
 
-주의:
-Caprice for Lute는 저작권이 있는 게임 OST이므로 파일은 포함하지 않았습니다.
-합법적으로 보유한 음원을 caprice-for-lute.mp3 파일명으로 넣어주세요.
+BGM
+- caprice-for-lute.mp3 파일이 같은 폴더에 있으면 그 파일 사용
+- 파일이 없으면 내장 오리지널 궁전풍 BGM 자동 사용
+- TIME ATTACK에서는 어느 쪽이든 1.5배 속도
+
+Cloudflare Pages:
+index.html, _headers, (선택) caprice-for-lute.mp3 를 업로드
+
+
+
+추가된 앱 아이콘:
+- apple-touch-icon.png
+- icon-192.png
+- icon-512.png
+- manifest.webmanifest
+
+이제 iPhone Safari 또는 Chrome에서
+'홈 화면에 추가'를 하면 해당 아이콘이 앱 그림으로 표시됩니다.
