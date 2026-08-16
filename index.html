@@ -721,12 +721,11 @@ function makeFireworks(){
  });
 }
 function praiseFanfare(){
- chord([261.63,329.63,392],0,.40,.035);
- chord([329.63,415.30,493.88],.12,.44,.036);
- chord([392,493.88,587.33],.27,.58,.038);
- tone(783.99,.40,.52,"sine",.05);
- tone(1046.5,.50,.60,"sine",.045);
- noiseBurst(.08,.16,.018);
+ chord([261.63,329.63,392],0,.42,.026);
+ chord([329.63,415.30,493.88],.15,.46,.028);
+ chord([392,493.88,587.33],.32,.62,.030);
+ tone(783.99,.44,.48,"sine",.034);
+ tone(1046.5,.56,.52,"sine",.028);
 }
 function showPraise(type){
  if(praiseOpen)return false;
@@ -782,11 +781,10 @@ function noiseBurst(start,dur,vol=.03){
 }
 function tapSfx(){tone(460,0,.025,"triangle",.008)}
 function grandCorrectSfx(){
- chord([261.63,329.63,392],0,.30,.026);
- noiseBurst(.02,.11,.010);
- tone(523.25,.08,.22,"sine",.035);tone(659.25,.15,.28,"sine",.035);tone(783.99,.22,.38,"sine",.04);
- chord([392,493.88,587.33],.28,.42,.024);
- tone(1046.5,.36,.42,"sine",.03)
+ chord([261.63,329.63,392],0,.34,.022);
+ tone(523.25,.10,.24,"sine",.028);
+ tone(659.25,.18,.30,"sine",.026);
+ chord([392,493.88,587.33],.30,.40,.020);
 }
 function grandWrongSfx(){
  chord([196,233.08,293.66],0,.28,.018);
@@ -801,53 +799,187 @@ function captureSfx(){
 
 /* BGM:
    1) If caprice-for-lute.mp3 exists, use it.
-   2) If missing/unplayable, automatically fall back to an original palace-adventure loop.
+   2) If missing/unplayable, use an original soft orchestral palace score.
+   The fallback is intentionally smooth and low-distraction:
+   warm string-like pads, cello/bass foundation, harp-like pulses, and sparse brass-style swells.
 */
-const bgmNotes={
- C3:130.81,D3:146.83,E3:164.81,F3:174.61,G3:196,A3:220,Bb3:233.08,
- C4:261.63,D4:293.66,E4:329.63,F4:349.23,G4:392,A4:440,Bb4:466.16,
- C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99
+let orchestraTimer=null;
+let orchestraStep=0;
+let orchestraSpeed=1;
+
+const ORCH={
+  C2:65.41,D2:73.42,E2:82.41,F2:87.31,G2:98.00,A2:110.00,Bb2:116.54,
+  C3:130.81,D3:146.83,E3:164.81,F3:174.61,G3:196.00,A3:220.00,Bb3:233.08,
+  C4:261.63,D4:293.66,E4:329.63,F4:349.23,G4:392.00,A4:440.00,Bb4:466.16,
+  C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99
 };
-const bgMel=["A4","Bb4","C5","E5","D5","C5","Bb4","A4","G4","A4","C5","D5","C5","Bb4","A4","G4",
-             "F4","G4","A4","C5","Bb4","A4","G4","F4","E4","G4","A4","Bb4","A4","G4","F4","E4"];
-const bgBass=["A3","A3","G3","G3","F3","F3","E3","E3"];
-function bgTick(){
- if(!save.music||!$("gameScreen").classList.contains("active"))return;
- const m=bgMel[bgmStep%bgMel.length],bs=bgBass[Math.floor(bgmStep/4)%bgBass.length];
- tone(bgmNotes[m],0,.19,"triangle",.012);
- tone(bgmNotes[m]*2,0,.10,"sine",.004);
- if(bgmStep%2===0)tone(bgmNotes[bs],0,.34,"triangle",.018);
- if(bgmStep%4===0)chord([bgmNotes[bs],bgmNotes[bs]*1.25,bgmNotes[bs]*1.5],0,.28,.006);
- bgmStep++;
+
+const ORCH_CHORDS=[
+  ["A2","E3","A3","C4","E4"],
+  ["F2","C3","F3","A3","C4"],
+  ["C3","G3","C4","E4","G4"],
+  ["G2","D3","G3","Bb3","D4"],
+  ["A2","E3","A3","C4","E4"],
+  ["F2","C3","F3","A3","C4"],
+  ["D3","A3","D4","F4","A4"],
+  ["E2","B2","E3","G3","B3"]
+];
+
+const ORCH_HARP=[
+  "A3","C4","E4","A4",
+  "F3","A3","C4","F4",
+  "C4","E4","G4","C5",
+  "G3","Bb3","D4","G4"
+];
+
+function softEnvelope(g,c,start,attack,hold,release,vol){
+  g.gain.setValueAtTime(.0001,c.currentTime+start);
+  g.gain.exponentialRampToValueAtTime(vol,c.currentTime+start+attack);
+  g.gain.setValueAtTime(vol,c.currentTime+start+attack+hold);
+  g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+start+attack+hold+release);
 }
+
+function orchestralVoice(freq,start,dur,vol=.012,detune=0,type="sine"){
+  const c=getCtx(); if(!c) return;
+  if(c.state==="suspended") c.resume();
+
+  const o=c.createOscillator();
+  const g=c.createGain();
+  const lp=c.createBiquadFilter();
+
+  o.type=type;
+  o.frequency.value=freq;
+  o.detune.value=detune;
+
+  lp.type="lowpass";
+  lp.frequency.value=type==="sine" ? 2200 : 1200;
+  lp.Q.value=.3;
+
+  softEnvelope(g,c,start,.16,dur*.48,.42,vol);
+
+  o.connect(lp); lp.connect(g); g.connect(c.destination);
+  o.start(c.currentTime+start);
+  o.stop(c.currentTime+start+dur+1);
+}
+
+function stringPad(noteNames,start,dur){
+  noteNames.forEach((n,i)=>{
+    const f=ORCH[n];
+    const v=i<2?.010:.0085;
+    orchestralVoice(f,start,dur,v,-5,"sine");
+    orchestralVoice(f,start+.01,dur,v*.72,5,"triangle");
+  });
+}
+
+function cello(note,start,dur){
+  const f=ORCH[note];
+  orchestralVoice(f,start,dur,.016,-3,"sine");
+  orchestralVoice(f*2,start+.02,dur,.006,3,"triangle");
+}
+
+function harp(note,start){
+  const c=getCtx(); if(!c) return;
+  const f=ORCH[note];
+  const o=c.createOscillator(),g=c.createGain(),lp=c.createBiquadFilter();
+  o.type="triangle";o.frequency.value=f;
+  lp.type="lowpass";lp.frequency.value=2600;
+  g.gain.setValueAtTime(.014,c.currentTime+start);
+  g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+start+.42);
+  o.connect(lp);lp.connect(g);g.connect(c.destination);
+  o.start(c.currentTime+start);o.stop(c.currentTime+start+.5);
+}
+
+function brassSwell(notes,start,dur){
+  notes.forEach((n,i)=>{
+    const f=ORCH[n];
+    orchestralVoice(f,start,dur,.0065,-2+i*2,"triangle");
+  });
+}
+
+function orchestralBar(){
+  if(!save.music || !$("gameScreen").classList.contains("active")) return;
+
+  const idx=orchestraStep % ORCH_CHORDS.length;
+  const chord=ORCH_CHORDS[idx];
+  const barDur=3.2/orchestraSpeed;
+
+  stringPad(chord,0,barDur*1.12);
+  cello(chord[0],0,barDur*.95);
+
+  const harpBase=(idx%4)*4;
+  for(let i=0;i<4;i++){
+    harp(ORCH_HARP[harpBase+i], (i*.62)/orchestraSpeed);
+  }
+
+  if(idx===3 || idx===7){
+    brassSwell(chord.slice(2),1.25/orchestraSpeed,1.6/orchestraSpeed);
+  }
+
+  orchestraStep++;
+}
+
 function startFallbackBgm(speed){
- if(bgmTimer)return;
- const rate=speed||1;
- const c=getCtx();if(c&&c.state==="suspended")c.resume();
- bgmStep=0;bgTick();bgmTimer=setInterval(bgTick,225/rate)
+  if(orchestraTimer)return;
+  orchestraSpeed=speed||1;
+  orchestraStep=0;
+  orchestralBar();
+  orchestraTimer=setInterval(orchestralBar,3200/orchestraSpeed);
 }
-function stopFallback(){if(bgmTimer){clearInterval(bgmTimer);bgmTimer=null}}
+
+function stopFallback(){
+  if(orchestraTimer){
+    clearInterval(orchestraTimer);
+    orchestraTimer=null;
+  }
+}
+
 async function startBgmFromGesture(){
- if(!save.music)return;
- const a=$("licensedBgm");a.volume=.72;a.playbackRate=save.timeAttack?1.5:1;
- try{
-   await a.play();usingFileBgm=true;stopFallback();
- }catch(e){
-   usingFileBgm=false;startFallbackBgm(save.timeAttack?1.5:1);
- }
+  if(!save.music)return;
+  const a=$("licensedBgm");
+  a.volume=.50;
+  a.playbackRate=save.timeAttack?1.5:1;
+  try{
+    await a.play();
+    usingFileBgm=true;
+    stopFallback();
+  }catch(e){
+    usingFileBgm=false;
+    startFallbackBgm(save.timeAttack?1.5:1);
+  }
 }
+
 function stopAllBgm(){
- $("licensedBgm").pause();stopFallback()
+  $("licensedBgm").pause();
+  stopFallback();
 }
+
 function toggleMusic(){
- save.music=!save.music;persist();
- if(save.music)startBgmFromGesture();else stopAllBgm();
- updateHUD();
+  save.music=!save.music;
+  persist();
+  if(save.music)startBgmFromGesture();
+  else stopAllBgm();
+  updateHUD();
 }
-$("licensedBgm").addEventListener("error",()=>{if(save.music){usingFileBgm=false;startFallbackBgm(save.timeAttack?1.5:1)}});
+
+function setBgmSpeed(rate){
+  const a=$("licensedBgm");
+  a.playbackRate=rate;
+  if(!usingFileBgm && save.music){
+    stopFallback();
+    startFallbackBgm(rate);
+  }
+}
+
+$("licensedBgm").addEventListener("error",()=>{
+  if(save.music){
+    usingFileBgm=false;
+    startFallbackBgm(save.timeAttack?1.5:1);
+  }
+});
+
 document.addEventListener("visibilitychange",()=>{
- if(document.hidden)stopAllBgm();
- else if(save.music&&$("gameScreen").classList.contains("active"))startBgmFromGesture();
+  if(document.hidden) stopAllBgm();
+  else if(save.music && $("gameScreen").classList.contains("active")) startBgmFromGesture();
 });
 
 $("startBtn").addEventListener("click",enterGame);
