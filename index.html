@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#142116">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>구구단 탐험대</title>
+<style>
+:root{
+  --ink:#f7f0d8; --muted:#c3c1a8; --gold:#ffd05a; --orange:#ff8e3c;
+  --green:#8ee57b; --red:#ff6a62; --dark:#101812; --wood:#5a3826;
+  --panel:rgba(18,29,20,.90); --line:rgba(255,240,190,.18);
+  --shadow:0 12px 28px rgba(0,0,0,.34);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#0d1710;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+body{min-height:100vh;overflow-x:hidden}
+button,input{font:inherit}
+button{border:0;cursor:pointer;touch-action:manipulation}
+.screen{display:none;min-height:100vh}
+.screen.active{display:flex}
+
+/* ---------- TITLE / CLUBHOUSE ---------- */
+#startScreen{
+  position:relative;align-items:center;justify-content:center;padding:22px;
+  background:
+    radial-gradient(circle at 50% 25%,rgba(255,207,99,.12),transparent 28%),
+    linear-gradient(#17261d 0 42%,#102017 42% 100%);
+  overflow:hidden;
+}
+.sky-stars{position:absolute;inset:0;opacity:.55;background-image:
+  radial-gradient(circle,#fff8c9 0 1px,transparent 1.6px),
+  radial-gradient(circle,#fff8c9 0 1px,transparent 1.6px);
+  background-size:83px 83px,121px 121px;background-position:12px 20px,43px 53px;
+}
+.moon{position:absolute;right:8%;top:7%;width:76px;height:76px;border-radius:50%;background:#f6e8ad;box-shadow:0 0 35px rgba(246,232,173,.35)}
+.moon:after{content:"";position:absolute;width:65px;height:65px;border-radius:50%;background:#17261d;left:-13px;top:-6px}
+.clubhouse{
+  position:absolute;left:50%;transform:translateX(-50%);bottom:0;width:min(760px,115vw);height:58vh;
+  background:linear-gradient(90deg,#4b3022,#6a4128 20%,#573725 45%,#70482c 70%,#4d3122);
+  clip-path:polygon(8% 24%,28% 24%,37% 5%,50% 18%,62% 2%,75% 24%,93% 24%,100% 100%,0 100%,0 34%);
+  opacity:.92;box-shadow:0 -20px 50px rgba(0,0,0,.25);
+}
+.clubhouse:before{
+  content:"";position:absolute;left:8%;right:8%;top:25%;bottom:0;
+  background:
+    linear-gradient(90deg,transparent 48%,rgba(30,18,12,.4) 49% 51%,transparent 52%),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 2px,transparent 2px 28px);
+}
+.window{
+  position:absolute;bottom:15%;width:90px;height:115px;border:8px solid #2b2019;background:#f0b85c;
+  box-shadow:0 0 30px rgba(255,180,70,.28);z-index:1;
+}
+.window.w1{left:12%}.window.w2{right:12%}
+.window:before,.window:after{content:"";position:absolute;background:#38291f}
+.window:before{width:5px;top:0;bottom:0;left:50%}.window:after{height:5px;left:0;right:0;top:50%}
+.sign{
+  position:absolute;left:50%;bottom:37%;transform:translateX(-50%) rotate(-2deg);z-index:2;
+  padding:10px 20px;background:#3d2a1d;border:3px solid #9a6a39;border-radius:8px;
+  color:#f8d980;font-size:14px;font-weight:900;letter-spacing:2px;white-space:nowrap;
+}
+.ball{position:absolute;bottom:5%;right:8%;width:68px;height:68px;border-radius:50%;background:#e8e5d7;border:5px solid #252a25;z-index:2}
+.ball:before{content:"";position:absolute;width:23px;height:23px;background:#283028;clip-path:polygon(50% 0,100% 38%,81% 100%,19% 100%,0 38%);left:18px;top:17px}
+.fern{position:absolute;bottom:-2%;left:2%;font-size:95px;filter:brightness(.5);z-index:2;transform:rotate(-8deg)}
+.start-card{
+  position:relative;z-index:5;width:min(100%,460px);padding:26px 20px 22px;
+  border:1px solid rgba(255,238,180,.22);border-radius:24px;background:rgba(12,20,14,.88);
+  box-shadow:0 24px 60px rgba(0,0,0,.45);backdrop-filter:blur(8px);
+}
+.logo-small{font-size:12px;letter-spacing:3px;color:#f5ce68;font-weight:900;text-align:center}
+.start-card h1{margin:7px 0 3px;text-align:center;font-size:37px;letter-spacing:-2px;line-height:1.08}
+.start-card .sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:22px}
+.name-label{font-size:13px;color:#e6d9b7;font-weight:800;margin:0 2px 8px}
+.name-input{
+  width:100%;height:58px;border-radius:15px;border:2px solid rgba(255,219,123,.25);
+  background:#0e1711;color:#fff;text-align:center;font-size:22px;font-weight:900;outline:none;
+}
+.name-input:focus{border-color:#f3c75c}
+.primary{
+  width:100%;height:60px;margin-top:12px;border-radius:16px;background:linear-gradient(#ffb448,#ed7f2d);
+  color:#20130c;font-size:19px;font-weight:950;box-shadow:0 5px 0 #9f481b;
+}
+.primary:active{transform:translateY(3px);box-shadow:0 2px 0 #9f481b}
+.resume-stats{display:none;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 3px}
+.resume-stats.show{display:grid}
+.mini-stat{background:rgba(255,255,255,.055);border:1px solid var(--line);border-radius:13px;padding:10px 5px;text-align:center}
+.mini-stat b{display:block;color:#ffdc72;font-size:20px}.mini-stat span{font-size:11px;color:var(--muted)}
+.link-btn{display:none;width:100%;margin-top:12px;background:transparent;color:#a8ab9e;text-decoration:underline;font-size:12px}
+
+/* ---------- GAME ---------- */
+#gameScreen{
+  flex-direction:column;align-items:center;padding:calc(12px + env(safe-area-inset-top)) 13px calc(14px + env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at 50% -8%,rgba(106,160,97,.20),transparent 35%),
+    linear-gradient(#17251b,#0c140e);
+}
+.game-shell{width:min(100%,540px)}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 10px}
+.player{font-size:15px;font-weight:900}.player small{display:block;font-size:10px;color:#9da493;letter-spacing:1.5px;margin-bottom:2px}
+.stat-row{display:flex;gap:7px}
+.stat-pill{border:1px solid var(--line);background:rgba(0,0,0,.18);border-radius:999px;padding:7px 10px;font-size:13px;font-weight:900}
+.game-card{
+  position:relative;overflow:hidden;border:1px solid rgba(255,229,150,.17);border-radius:28px;
+  background:
+    linear-gradient(rgba(18,29,20,.92),rgba(18,29,20,.95)),
+    repeating-linear-gradient(0deg,#6e4a30 0 2px,#503620 2px 27px);
+  padding:18px 15px 17px;box-shadow:var(--shadow);
+}
+.game-card:before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.18;
+  background:radial-gradient(circle at 10% 20%,#fff 0 1px,transparent 1px);
+  background-size:36px 36px;
+}
+.stage-line{position:relative;display:flex;align-items:center;justify-content:space-between;color:#adb6a5;font-size:11px;font-weight:800;letter-spacing:.4px}
+.music-btn{width:38px;height:38px;border-radius:50%;background:#263528;color:#f7d575;font-size:17px;border:1px solid var(--line)}
+.question-wrap{position:relative;text-align:center;margin-top:3px}
+.question-tag{font-size:12px;color:#e0c776;font-weight:900;letter-spacing:2px}
+.question{
+  font-variant-numeric:tabular-nums;font-feature-settings:"tnum";white-space:nowrap;
+  margin:9px 0 5px;font-size:clamp(68px,19vw,104px);line-height:1;font-weight:1000;
+  letter-spacing:-4px;color:#fff9df;text-shadow:0 4px 0 #273126,0 0 18px rgba(255,229,122,.08);
+}
+.message{min-height:28px;font-size:17px;font-weight:950;color:#eee8cd}
+.message.good{color:#9aff8c;text-shadow:0 0 15px rgba(112,255,91,.22)}
+.message.bad{color:#ff857d}
+.answer-display{
+  position:relative;height:86px;margin:13px 0 14px;border:3px solid #d9c47d;border-radius:18px;
+  background:#09100b;display:flex;align-items:center;justify-content:center;
+  font-variant-numeric:tabular-nums;font-size:52px;font-weight:1000;color:#ffe576;
+  box-shadow:inset 0 0 20px rgba(0,0,0,.75),0 0 0 2px rgba(0,0,0,.26);
+}
+.answer-display.empty{color:#596457}
+.keys{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.key{
+  min-height:80px;border-radius:17px;border:2px solid #bd9f59;
+  background:linear-gradient(#f9e6a5,#d6b65c);color:#172017;
+  font-size:42px;line-height:1;font-weight:1000;box-shadow:0 5px 0 #725424,0 8px 16px rgba(0,0,0,.2);
+}
+.key:active{transform:translateY(4px);box-shadow:0 1px 0 #725424}
+.key.utility{font-size:16px;background:linear-gradient(#445744,#2d3c30);color:#e8e9d8;border-color:#637264;box-shadow:0 5px 0 #19221a}
+.hint{
+  position:relative;display:none;margin-top:15px;padding:14px;border-radius:17px;
+  background:#172319;border:1px solid #56664f;
+}
+.hint.show{display:block;animation:rise .22s ease}
+.hint-title{font-weight:950;color:#ffd669;font-size:16px}
+.hint-text{font-size:13px;line-height:1.5;color:#d7d7bf;margin:5px 0 11px}
+.groups{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;max-height:145px;overflow:auto}
+.group{width:55px;min-height:55px;border:2px solid #9e8149;border-radius:12px;padding:6px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-content:center;background:#0e1710}
+.dot{width:8px;height:8px;border-radius:50%;background:#ffd35a;box-shadow:0 0 5px rgba(255,211,90,.35)}
+.record-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}
+.record{background:rgba(0,0,0,.17);border:1px solid var(--line);padding:8px 5px;border-radius:11px;text-align:center}
+.record b{display:block;color:#f6d879;font-size:16px}.record span{font-size:10px;color:#9da493}
+
+/* effects */
+.flash{position:fixed;inset:0;pointer-events:none;background:rgba(172,255,114,.13);opacity:0;z-index:50}
+.flash.go{animation:flash .35s ease}
+.combo-burst{position:fixed;left:50%;top:35%;transform:translate(-50%,-50%) scale(.6);z-index:60;pointer-events:none;opacity:0;font-size:45px;font-weight:1000;color:#ffe068;text-shadow:0 4px 0 #923f19,0 0 22px rgba(255,224,104,.45)}
+.combo-burst.go{animation:burst .65s ease}
+@keyframes flash{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
+@keyframes burst{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}35%{opacity:1;transform:translate(-50%,-50%) scale(1.16)}100%{opacity:0;transform:translate(-50%,-60%) scale(1)}}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(max-height:760px){
+  .game-card{padding-top:13px}.question{font-size:68px;margin:5px 0}.answer-display{height:68px;font-size:44px;margin:9px 0 10px}
+  .key{min-height:65px;font-size:34px}.record-strip{margin-top:8px}.hint{margin-top:10px}
+}
+</style>
+</head>
+<body>
+
+<section id="startScreen" class="screen active">
+  <div class="sky-stars"></div><div class="moon"></div>
+  <div class="clubhouse"><div class="window w1"></div><div class="window w2"></div><div class="sign">DINOSAUR LEAGUE CLUBHOUSE</div></div>
+  <div class="fern">🌿</div><div class="ball"></div>
+  <div class="start-card">
+    <div class="logo-small">RETRO MATH ADVENTURE</div>
+    <h1 id="startTitle">구구단 탐험대</h1>
+    <div id="startSub" class="sub">이름을 등록하고 모험을 시작하자.</div>
+
+    <div id="newUserArea">
+      <div class="name-label">PLAYER NAME</div>
+      <input id="nameInput" class="name-input" maxlength="10" placeholder="이름 입력" autocomplete="off">
+    </div>
+
+    <div id="resumeStats" class="resume-stats">
+      <div class="mini-stat"><b id="resumeScore">0</b><span>누적 점수</span></div>
+      <div class="mini-stat"><b id="resumeCorrect">0</b><span>정답 수</span></div>
+      <div class="mini-stat"><b id="resumeRate">0%</b><span>정답률</span></div>
+    </div>
+
+    <button id="startBtn" class="primary" type="button">모험 시작!</button>
+    <button id="changeUser" class="link-btn" type="button">플레이어 다시 등록</button>
+  </div>
+</section>
+
+<section id="gameScreen" class="screen">
+  <div class="game-shell">
+    <header class="topbar">
+      <div class="player"><small>PLAYER</small><span id="playerName">박세현</span></div>
+      <div class="stat-row">
+        <div class="stat-pill">⭐ <span id="score">0</span></div>
+        <div class="stat-pill">🔥 <span id="streak">0</span></div>
+      </div>
+    </header>
+
+    <main class="game-card">
+      <div class="stage-line">
+        <span>2단 ~ 9단 · RANDOM MISSION</span>
+        <button id="musicBtn" class="music-btn" type="button" aria-label="배경음 켜기/끄기">♫</button>
+      </div>
+
+      <div class="question-wrap">
+        <div class="question-tag">MULTIPLICATION</div>
+        <div id="question" class="question">7 × 8</div>
+        <div id="message" class="message">답을 눌러봐!</div>
+      </div>
+
+      <div id="answerDisplay" class="answer-display empty">?</div>
+
+      <div class="keys">
+        <button class="key" type="button" data-num="1">1</button>
+        <button class="key" type="button" data-num="2">2</button>
+        <button class="key" type="button" data-num="3">3</button>
+        <button class="key" type="button" data-num="4">4</button>
+        <button class="key" type="button" data-num="5">5</button>
+        <button class="key" type="button" data-num="6">6</button>
+        <button class="key" type="button" data-num="7">7</button>
+        <button class="key" type="button" data-num="8">8</button>
+        <button class="key" type="button" data-num="9">9</button>
+        <button id="clearBtn" class="key utility" type="button">지우기</button>
+        <button class="key" type="button" data-num="0">0</button>
+        <button id="backBtn" class="key utility" type="button">⌫</button>
+      </div>
+
+      <div id="hint" class="hint">
+        <div class="hint-title">🦕 그림으로 다시 보자</div>
+        <div id="hintText" class="hint-text"></div>
+        <div id="groups" class="groups"></div>
+      </div>
+
+      <div class="record-strip">
+        <div class="record"><b id="correctCount">0</b><span>정답</span></div>
+        <div class="record"><b id="accuracy">0%</b><span>정답률</span></div>
+        <div class="record"><b id="bestStreak">0</b><span>최고 연속</span></div>
+      </div>
+    </main>
+  </div>
+</section>
+
+<div id="flash" class="flash"></div>
+<div id="comboBurst" class="combo-burst">NICE!</div>
+
+<script>
+(() => {
+"use strict";
+
+const SAVE_KEY = "sehyeonMathAdventure_v1";
+const defaultSave = {
+  name:"", score:0, correct:0, wrong:0, streak:0, bestStreak:0,
+  lastA:0,lastB:0,music:true
+};
+let save = loadSave();
+let A=2,B=2,typed="",locked=false;
+let audioCtx=null, musicTimer=null, musicStep=0;
+
+const $ = id => document.getElementById(id);
+function loadSave(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    return raw ? {...defaultSave,...JSON.parse(raw)} : {...defaultSave};
+  }catch(e){ return {...defaultSave}; }
+}
+function persist(){ localStorage.setItem(SAVE_KEY,JSON.stringify(save)); }
+function accuracy(){
+  const total=save.correct+save.wrong;
+  return total ? Math.round(save.correct/total*100) : 0;
+}
+function setupStart(){
+  if(save.name){
+    $("newUserArea").style.display="none";
+    $("resumeStats").classList.add("show");
+    $("changeUser").style.display="block";
+    $("startTitle").textContent=save.name+"의 구구단 탐험";
+    $("startSub").textContent="지난 기록에 이어서 모험을 계속하자!";
+    $("startBtn").textContent="이어하기";
+    $("resumeScore").textContent=save.score;
+    $("resumeCorrect").textContent=save.correct;
+    $("resumeRate").textContent=accuracy()+"%";
+  }else{
+    $("newUserArea").style.display="block";
+    $("resumeStats").classList.remove("show");
+    $("changeUser").style.display="none";
+    $("startTitle").textContent="구구단 탐험대";
+    $("startSub").textContent="이름을 등록하고 모험을 시작하자.";
+    $("startBtn").textContent="모험 시작!";
+  }
+}
+function enterGame(){
+  if(!save.name){
+    const n=$("nameInput").value.trim();
+    if(!n){ $("nameInput").focus(); return; }
+    save.name=n; persist();
+  }
+  $("playerName").textContent=save.name;
+  $("startScreen").classList.remove("active");
+  $("gameScreen").classList.add("active");
+  updateHUD();
+  startAudioFromGesture();
+  newQuestion();
+}
+function changeUser(){
+  if(!confirm("현재 기록을 지우고 플레이어를 다시 등록할까?")) return;
+  stopMusic();
+  localStorage.removeItem(SAVE_KEY);
+  save={...defaultSave};
+  $("nameInput").value="";
+  setupStart();
+}
+function updateHUD(){
+  $("score").textContent=save.score;
+  $("streak").textContent=save.streak;
+  $("correctCount").textContent=save.correct;
+  $("accuracy").textContent=accuracy()+"%";
+  $("bestStreak").textContent=save.bestStreak;
+  $("musicBtn").textContent=save.music ? "♫" : "♪";
+  persist();
+}
+function renderAnswer(){
+  if(!typed){
+    $("answerDisplay").textContent="?";
+    $("answerDisplay").classList.add("empty");
+  }else{
+    $("answerDisplay").textContent=typed;
+    $("answerDisplay").classList.remove("empty");
+  }
+}
+function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function newQuestion(){
+  locked=false; typed="";
+  let tries=0;
+  do{
+    A=rand(2,9); B=rand(1,9); tries++;
+  }while(A===save.lastA && B===save.lastB && tries<20);
+  save.lastA=A;save.lastB=B;persist();
+  $("question").textContent=A+" × "+B;
+  $("message").textContent="답을 눌러봐!";
+  $("message").className="message";
+  $("hint").classList.remove("show");
+  $("groups").innerHTML="";
+  renderAnswer();
+}
+function showHint(){
+  $("hintText").innerHTML="<b>"+A+" × "+B+"</b>는 <b>"+A+"개씩 "+B+"묶음</b>이야. 하나씩 세어 보면 <b>"+(A*B)+"개</b>!";
+  const groups=$("groups"); groups.innerHTML="";
+  for(let g=0;g<B;g++){
+    const box=document.createElement("div"); box.className="group";
+    for(let i=0;i<A;i++){ const dot=document.createElement("span");dot.className="dot";box.appendChild(dot); }
+    groups.appendChild(box);
+  }
+  $("hint").classList.add("show");
+}
+function pressNumber(n){
+  if(locked || typed.length>=2) return;
+  typed+=String(n); renderAnswer(); sfxTap(); evaluate();
+}
+function evaluate(){
+  if(!typed) return;
+  const ans=String(A*B);
+  if(typed===ans){ onCorrect(); return; }
+  if(ans.startsWith(typed) && typed.length<ans.length) return;
+  onWrong();
+}
+function onCorrect(){
+  locked=true;
+  save.correct++; save.streak++;
+  save.bestStreak=Math.max(save.bestStreak,save.streak);
+  const bonus=Math.min(save.streak-1,5)*2;
+  save.score += 10+bonus;
+  $("message").textContent=save.streak>=5 ? "🔥 "+save.streak+"연속! 완벽해!" : "정답! +"+(10+bonus)+"점";
+  $("message").className="message good";
+  updateHUD(); sfxCorrect(); visualCorrect();
+  setTimeout(newQuestion,850);
+}
+function onWrong(){
+  locked=true;
+  save.wrong++; save.streak=0; save.score=Math.max(0,save.score-2);
+  $("message").textContent="아깝다! 그림을 보고 다시!";
+  $("message").className="message bad";
+  updateHUD(); sfxWrong(); showHint();
+  setTimeout(()=>{
+    locked=false;typed="";renderAnswer();
+    $("message").textContent="그림을 보고 다시 맞혀봐!";
+    $("message").className="message";
+  },950);
+}
+function clearAnswer(){ if(!locked){typed="";renderAnswer();sfxTap();} }
+function backspace(){ if(!locked){typed=typed.slice(0,-1);renderAnswer();sfxTap();} }
+function visualCorrect(){
+  const f=$("flash"); f.classList.remove("go"); void f.offsetWidth; f.classList.add("go");
+  const b=$("comboBurst");
+  b.textContent=save.streak>=5 ? save.streak+" COMBO!" : ["NICE!","GREAT!","YES!"][Math.floor(Math.random()*3)];
+  b.classList.remove("go");void b.offsetWidth;b.classList.add("go");
+}
+
+/* ---------------- ORIGINAL 16-BIT MARITIME-ADVENTURE MUSIC ----------------
+   This is an original procedural loop, not a melody/transcription from any game.
+------------------------------------------------------------------------- */
+function ensureAudio(){
+  if(audioCtx) return audioCtx;
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC) return null;
+  audioCtx=new AC();
+  return audioCtx;
+}
+function tone(freq,start,dur,type="square",vol=.025){
+  const ctx=ensureAudio(); if(!ctx) return;
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.type=type;o.frequency.setValueAtTime(freq,ctx.currentTime+start);
+  g.gain.setValueAtTime(vol,ctx.currentTime+start);
+  g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+start+dur);
+  o.connect(g);g.connect(ctx.destination);
+  o.start(ctx.currentTime+start);o.stop(ctx.currentTime+start+dur);
+}
+function startAudioFromGesture(){
+  const ctx=ensureAudio(); if(ctx && ctx.state==="suspended")ctx.resume();
+  if(save.music) startMusic();
+}
+const NOTE={
+ C3:130.81,D3:146.83,E3:164.81,G3:196,A3:220,B3:246.94,
+ C4:261.63,D4:293.66,E4:329.63,Fs4:369.99,G4:392,A4:440,B4:493.88,
+ C5:523.25,D5:587.33,E5:659.25,G5:783.99
+};
+/* jaunty, sea-going original chord/arpeggio pattern */
+const melody=["E4","G4","A4","B4","A4","G4","E4","D4","E4","A4","B4","D5","B4","A4","G4","E4",
+              "G4","B4","C5","B4","G4","E4","D4","E4","A4","C5","B4","A4","G4","E4","D4","E4"];
+const bass=["A3","A3","E3","E3","G3","G3","D3","D3"];
+function musicTick(){
+  if(!save.music || !$("gameScreen").classList.contains("active")) return;
+  const m=melody[musicStep%melody.length];
+  const bs=bass[Math.floor(musicStep/4)%bass.length];
+  tone(NOTE[m],0,.16,"square",.018);
+  if(musicStep%2===0) tone(NOTE[bs],0,.24,"triangle",.026);
+  if(musicStep%4===0) tone(70,0,.045,"square",.011);
+  musicStep++;
+}
+function startMusic(){
+  if(musicTimer) return;
+  musicStep=0; musicTick();
+  musicTimer=setInterval(musicTick,210);
+}
+function stopMusic(){ if(musicTimer){clearInterval(musicTimer);musicTimer=null;} }
+function toggleMusic(){
+  save.music=!save.music;persist();updateHUD();
+  const ctx=ensureAudio();if(ctx&&ctx.state==="suspended")ctx.resume();
+  if(save.music)startMusic();else stopMusic();
+}
+function sfxTap(){ tone(310,0,.035,"square",.012); }
+function sfxCorrect(){
+  tone(523,0,.07,"square",.045);
+  tone(659,.065,.08,"square",.045);
+  tone(784,.13,.09,"square",.05);
+  tone(1046,.205,.18,"square",.055);
+  tone(130,.01,.10,"triangle",.035);
+}
+function sfxWrong(){
+  tone(196,0,.12,"sawtooth",.028);
+  tone(164,.10,.15,"sawtooth",.026);
+  tone(130,.22,.20,"square",.02);
+}
+
+$("startBtn").addEventListener("click",enterGame);
+$("changeUser").addEventListener("click",changeUser);
+$("musicBtn").addEventListener("click",toggleMusic);
+$("clearBtn").addEventListener("click",clearAnswer);
+$("backBtn").addEventListener("click",backspace);
+document.querySelectorAll("[data-num]").forEach(btn=>{
+  btn.addEventListener("click",()=>pressNumber(btn.dataset.num));
+});
+$("nameInput").addEventListener("keydown",e=>{if(e.key==="Enter")enterGame();});
+window.addEventListener("keydown",e=>{
+  if(!$("gameScreen").classList.contains("active")) return;
+  if(/^[0-9]$/.test(e.key))pressNumber(e.key);
+  if(e.key==="Backspace")backspace();
+});
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden) stopMusic();
+  else if(save.music && $("gameScreen").classList.contains("active")) startMusic();
+});
+
+setupStart();
+})();
+</script>
+</body>
+</html>
